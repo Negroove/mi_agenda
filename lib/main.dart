@@ -27,16 +27,43 @@ class MyApp extends StatelessWidget {
         title: 'Mi Agenda',
         theme: AppTheme.theme,
         debugShowCheckedModeBanner: false,
-        home: Builder(
-          
-          builder:  (context) {
-          // Usamos un Builder para tener un context con los providers
-          // y decidir qué pantalla mostrar: Login o Contactos
-          final auth = context.watch<AuthProvider>();
-          return auth.isAuth ? const ContactsScreen() : const LoginScreen();
-        }
+        home: const AuthGate(),
+
         ),
-      ),
-    );
+      );
+  }
+}
+
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 1) cargamos SharedPreferences e hidratamos isAuth
+    Future.microtask(() async {
+      await context.read<AuthProvider>().init();
+      if (mounted) setState(() => _ready = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 2) mientras lee prefs, mostramos loader
+    if (!_ready) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    // 3) si ya estaba autenticado, va directo a Contactos
+    final isAuth = context.watch<AuthProvider>().isAuth;
+    return isAuth ? const ContactsScreen() : const LoginScreen();
   }
 }
