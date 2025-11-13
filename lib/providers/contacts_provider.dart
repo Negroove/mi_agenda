@@ -51,10 +51,10 @@ class ContactsProvider extends ChangeNotifier {
     final q = query.toLowerCase();
 
     return _contacts.where((c) {
-      return c.nombre.toLowerCase().contains(q) ||
-          c.apellido.toLowerCase().contains(q) ||
-          c.telefono.toLowerCase().contains(q) ||
-          c.email.toLowerCase().contains(q);
+      return normalize(c.nombre).contains(q) ||
+          normalize(c.apellido).contains(q) ||
+          normalize(c.telefono).contains(q) ||
+          normalize(c.email).contains(q);
     }).toList();
   }
 }
