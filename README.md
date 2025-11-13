@@ -1,48 +1,77 @@
 # mi_agenda
 
-Aplicación Flutter sencilla para gestionar contactos.
+Aplicación Flutter moderna para gestionar contactos, con Provider para manejo de estado y SQLite para persistencia real.
 
-## Descripción
+## 📌 Descripción
 
-**mi_agenda** es una app de ejemplo para gestionar contactos, con login de demostración, listado con búsqueda y alta de contactos usando Provider para la gestión de estado.
+**mi_agenda** es una app completa de gestión de contactos. Incluye autenticación de demostración, listado con búsqueda avanzada, vista de detalle, creación, edición y eliminación de contactos.  
+Utiliza **Provider**, **SQLite (sqflite)**, estilos globales y soporte total para **tema oscuro**.
 
-## Funcionalidades
+---
 
-- **Login de demostración**
-    - Usuario: `admin@mail`
-    - Contraseña: `123456`
-- **Listado de contactos**
-    - Visualización en lista
-    - Búsqueda en tiempo real por nombre, apellido, teléfono o email
-- **Alta de contacto**
-    - Campos: Nombre, Apellido, Teléfono, Email, Dirección, Fecha de nacimiento
-    - Validaciones básicas e input formatters
-    - Avatar con iniciales si no hay imagen
-- **Tema oscuro**
-- **Estilos globales** para AppBar, Inputs y Botones
-- **Logout**
-- **Persistencia:** en memoria (no se guarda al cerrar la app)
+## 🚀 Funcionalidades
 
-## Estructura del proyecto
+### 🔐 Login de demostración
+- Usuario: `admin@mail`
+- Contraseña: `123456`
 
+### 📇 Contactos
+- Crear contacto
+- Editar contacto (detalle reactivo, siempre actualizado)
+- Eliminar contacto con diálogo personalizado
+- Avatar generado con iniciales
+- Persistencia local con SQLite
+
+### 🔎 Búsqueda avanzada (en tiempo real)
+Podés buscar por:
+- Nombre  
+- Apellido  
+- Teléfono  
+- Email  
+
+### 🗑️ Diálogo de eliminación personalizado
+- Botón **Eliminar** usando el color primario del tema
+- Botón **Cancelar** estilo oscuro
+- Ambos botones full-width y alineados verticalmente
+
+### 🎨 Tema oscuro y estilos globales
+- AppBar estilizado
+- Botones con tema global
+- Inputs unificados
+- Colores consistentes según AppTheme
+
+### 🧩 Arquitectura basada en Provider
+- `AuthProvider` para login
+- `ContactsProvider` para CRUD, búsqueda y carga desde SQLite
+- Detalle del contacto basado en ID para obtener siempre datos actualizados
+
+---
+
+## 📁 Estructura del proyecto
 ```
+
 lib/
-├─ app_theme.dart
-├─ main.dart
+├─ app_theme.dart # Tema global (colores, estilos)
+├─ main.dart # Providers + AuthGate
 ├─ models/
-│  └─ contact.dart
+│ └─ contact.dart # Modelo Contact
+├─ data/
+│ └─ contacts_db.dart # CRUD SQLite
 ├─ providers/
-│  ├─ auth_provider.dart
-│  └─ contacts_provider.dart
+│ ├─ auth_provider.dart # Autenticación fake
+│ └─ contacts_provider.dart # Manejo de contactos + búsqueda
 ├─ screens/
-│  ├─ login_screen.dart
-│  ├─ contacts_screen.dart
-│  └─ contact_form_screen.dart
+│ ├─ login_screen.dart
+│ ├─ contacts_screen.dart # Lista + búsqueda + navegación
+│ ├─ contact_detail_screen.dart # Vista detallada reactiva
+│ └─ contact_form_screen.dart # Alta / edición con validaciones
 └─ widgets/
-     └─ login_form.dart
+│ └─ login_form.dart # Formulario
+└─ login_form.dart
 ```
+---
 
-## Primeros pasos
+## ▶️ Primeros pasos
 
 Instalar dependencias:
 
@@ -50,22 +79,7 @@ Instalar dependencias:
 flutter pub get
 ```
 
-Ejecutar en un dispositivo/emulador:
-
+Ejecutar en dispositivo o emulador:
 ```bash
 flutter run
 ```
-
-Opcional: Builds
-
-```bash
-# Android
-flutter build apk
-
-# iOS (desde macOS)
-flutter build ios
-```
-
----
-
-Desarrollado como ejemplo para prácticas de Flutter y Provider. 
