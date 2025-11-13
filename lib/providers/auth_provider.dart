@@ -2,14 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
-  SharedPreferences? _prefs; 
-  bool _loaded = false ;
+  SharedPreferences? _prefs;
+  bool _loaded = false;
   bool _isAuth = false;
   bool get isAuth => _isAuth;
 
   static const _demoUser = 'admin@mail';
   static const _demoPass = '123456';
-
 
   // Inicializa el provider cargando el estado de autenticación desde SharedPreferences.
   Future<void> init() async {
@@ -28,17 +27,21 @@ class AuthProvider extends ChangeNotifier {
     _isAuth = ok;
     notifyListeners();
 
-    if(ok) {
-      await (_prefs ??= await SharedPreferences.getInstance())
-          .setBool('auth_ok', true);
-      }
+    if (ok) {
+      await (_prefs ??= await SharedPreferences.getInstance()).setBool(
+        'auth_ok',
+        true,
+      );
+    }
     return ok;
   }
 
-  Future <void> logout() async {
+  Future<void> logout() async {
     _isAuth = false;
     notifyListeners();
-    await (_prefs ??= await SharedPreferences.getInstance())
-        .setBool('auth_ok', false);
+    await (_prefs ??= await SharedPreferences.getInstance()).setBool(
+      'auth_ok',
+      false,
+    );
   }
 }

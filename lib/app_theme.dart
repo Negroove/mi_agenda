@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color colorPrincipal = Color(0xF9DA0700); // color principal (medio rojito)
+  static const Color colorPrincipal = Color(
+    0xF9DA0700,
+  ); // color principal (medio rojito)
   static ThemeData theme = ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: const Color(0xFF121212),
-    colorScheme: const ColorScheme.dark(primary: colorPrincipal, secondary: colorPrincipal),
-    appBarTheme: const AppBarTheme(backgroundColor: Colors.black, centerTitle: true),
+    colorScheme: const ColorScheme.dark(
+      primary: colorPrincipal,
+      secondary: colorPrincipal,
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.black,
+      centerTitle: true,
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: colorPrincipal, foregroundColor: Colors.black,
+        backgroundColor: colorPrincipal,
+        foregroundColor: Colors.black,
         minimumSize: const Size.fromHeight(44),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      filled: true, fillColor: const Color(0xFF1E1E1E),
+      filled: true,
+      fillColor: const Color(0xFF1E1E1E),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
       enabledBorder: OutlineInputBorder(
         borderSide: const BorderSide(color: Color(0xFF3A3A3A)),

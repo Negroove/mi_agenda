@@ -1,46 +1,60 @@
 import 'package:flutter/foundation.dart';
 import '../models/contact.dart';
+import '../data/contacts_db.dart';
 
 class ContactsProvider extends ChangeNotifier {
-  // Array de contactos de prueba
-  final List<Contact> _contacts = [
-    const Contact(
-      id: '1',
-      nombre: 'Lucas',
-      apellido: 'Montoya',
-      email: 'email@mail.com',
-      direccion: 'Av. pueta lugones 94',       
-      telefono: '3512664947',
-      fechaNacimiento: null
-    ),
-    const Contact(
-      id: '2',
-      nombre: 'Ana',
-      apellido: 'Gomez',
-      email: 'email@email.com',
-      telefono: '3512664948',
-      direccion: 'Av. pueta lugones 94',      
-      fechaNacimiento: null 
-    ),
-  ];
+  final ContactsDb _db;
+  ContactsProvider(this._db);
+
+  bool _loaded = false;
+  final List<Contact> _contacts = [];
 
   List<Contact> get items => List.unmodifiable(_contacts);
 
-  void add(Contact c) {
+  Future<void> load() async {
+    if (_loaded) return;
+    await _db.open();
+    _contacts
+      ..clear()
+      ..addAll(await _db.getAll());
+    _loaded = true;
+    notifyListeners();
+  }
+
+  // metodos crud
+  Future<void> add(Contact c) async {
+    await _db.insert(c);
     _contacts.add(c);
     notifyListeners();
   }
 
+  Future<void> update(Contact c) async {
+    await _db.update(c);
+    final index = _contacts.indexWhere((x) => x.id == c.id);
+    if (index != -1) {
+      _contacts[index] = c;
+      notifyListeners();
+    }
+  }
+
+  Future<void> delete(String id) async {
+    await _db.deleteById(id);
+    _contacts.removeWhere((c) => c.id == id);
+    notifyListeners();
+  }
+
+  String normalize(String s) {
+    return s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+  }
+
   List<Contact> searchBy(String query) {
     final q = query.toLowerCase();
-    return _contacts
-        .where(
-          (c) =>
-              c.nombre.toLowerCase().contains(q) ||
-              c.apellido.toLowerCase().contains(q) ||
-              c.telefono.toLowerCase().contains(q) ||
-              c.email.toLowerCase().contains(q),
-        )
-        .toList(growable: false);
+
+    return _contacts.where((c) {
+      return c.nombre.toLowerCase().contains(q) ||
+          c.apellido.toLowerCase().contains(q) ||
+          c.telefono.toLowerCase().contains(q) ||
+          c.email.toLowerCase().contains(q);
+    }).toList();
   }
 }

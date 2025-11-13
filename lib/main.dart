@@ -5,6 +5,7 @@ import 'providers/auth_provider.dart';
 import 'providers/contacts_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/contacts_screen.dart';
+import 'data/contacts_db.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,24 +14,23 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      // proveedores de estados 
+      // proveedores de estados
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => ContactsProvider()),
+        ChangeNotifierProvider(create: (_) => ContactsProvider(ContactsDb())),
       ],
-      // la app en si 
+      // la app en si
       child: MaterialApp(
         title: 'Mi Agenda',
         theme: AppTheme.theme,
         debugShowCheckedModeBanner: false,
         home: const AuthGate(),
-
-        ),
-      );
+      ),
+    );
   }
 }
 
@@ -47,7 +47,7 @@ class _AuthGateState extends State<AuthGate> {
   @override
   void initState() {
     super.initState();
-    // 1) cargamos SharedPreferences e hidratamos isAuth
+    // cargamos SharedPreferences e hidratamos isAuth
     Future.microtask(() async {
       await context.read<AuthProvider>().init();
       if (mounted) setState(() => _ready = true);
@@ -56,13 +56,11 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    // 2) mientras lee prefs, mostramos loader
+    // mientras lee prefs, mostramos loader
     if (!_ready) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    // 3) si ya estaba autenticado, va directo a Contactos
+    // si ya estaba autenticado, va directo a Contactos
     final isAuth = context.watch<AuthProvider>().isAuth;
     return isAuth ? const ContactsScreen() : const LoginScreen();
   }

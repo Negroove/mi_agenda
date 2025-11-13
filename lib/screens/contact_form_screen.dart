@@ -6,7 +6,9 @@ import '../models/contact.dart';
 import '../providers/contacts_provider.dart';
 
 class ContactFormScreen extends StatefulWidget {
-  const ContactFormScreen({super.key});
+  final Contact? edit; // 👈 NUEVO — Si viene un contacto, es edición
+
+  const ContactFormScreen({super.key, this.edit});
 
   @override
   State<ContactFormScreen> createState() => _ContactFormScreenState();
@@ -26,6 +28,22 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
   bool _saving = false;
 
   @override
+  void initState() {
+    super.initState();
+
+    // Si es modo edición, precargo los datos en los campos
+    final c = widget.edit;
+    if (c != null) {
+      _nombreCtrl.text = c.nombre;
+      _apellidoCtrl.text = c.apellido;
+      _telCtrl.text = c.telefono;
+      _emailCtrl.text = c.email;
+      _dirCtrl.text = c.direccion;
+      _fechaNac = c.fechaNacimiento;
+    }
+  }
+
+  @override
   void dispose() {
     _nombreCtrl.dispose();
     _apellidoCtrl.dispose();
@@ -35,7 +53,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
     super.dispose();
   }
 
-  // --- Validadores simples
+  // --- Validadores simples ---
   String? _req(String? v, String campo) =>
       (v == null || v.trim().isEmpty) ? 'Ingrese $campo' : null;
 
@@ -63,38 +81,54 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _saving = true);
-    // crear Contact y guardar
-    final contact = Contact(
-      id: DateTime.now().millisecondsSinceEpoch.toString(), // id simple
-      nombre: _nombreCtrl.text.trim(),
-      apellido: _apellidoCtrl.text.trim(),
-      telefono: _telCtrl.text.trim(),
-      email: _emailCtrl.text.trim(),
-      direccion: _dirCtrl.text.trim(),
-      fechaNacimiento: _fechaNac,
-    );
 
-    context.read<ContactsProvider>().add(contact);
+    // ---------------------------
+    // MODO CREAR
+    // ---------------------------
+    if (widget.edit == null) {
+      final contact = Contact(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        nombre: _nombreCtrl.text.trim(),
+        apellido: _apellidoCtrl.text.trim(),
+        telefono: _telCtrl.text.trim(),
+        email: _emailCtrl.text.trim(),
+        direccion: _dirCtrl.text.trim(),
+        fechaNacimiento: _fechaNac,
+      );
+
+      await context.read<ContactsProvider>().add(contact);
+    } else {
+      // ---------------------------
+      // MODO EDITAR
+      // ---------------------------
+      final updated = Contact(
+        id: widget.edit!.id,
+        nombre: _nombreCtrl.text.trim(),
+        apellido: _apellidoCtrl.text.trim(),
+        telefono: _telCtrl.text.trim(),
+        email: _emailCtrl.text.trim(),
+        direccion: _dirCtrl.text.trim(),
+        fechaNacimiento: _fechaNac,
+      );
+
+      await context.read<ContactsProvider>().update(updated);
+    }
 
     if (!mounted) return;
     setState(() => _saving = false);
-    Navigator.of(context).pop(); // volver a la lista
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Contacto agregado')));
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-
     // Formatear fecha
-   final f = _fechaNac == null ? 'Sin definir' : 
-   DateFormat('dd/MM/yyyy').format(_fechaNac!);
+    final f = _fechaNac == null
+        ? 'Sin definir'
+        : DateFormat('dd/MM/yyyy').format(_fechaNac!);
 
-    // UI
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nuevo contacto'),
+        title: Text(widget.edit == null ? 'Nuevo contacto' : 'Editar contacto'),
         actions: [
           IconButton(
             onPressed: _saving ? null : _save,
@@ -117,7 +151,6 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                   textInputAction: TextInputAction.next,
                   validator: (v) => _req(v, 'el nombre'),
                   inputFormatters: [
-                    // solo letras, espacios, apostrofes y guiones
                     FilteringTextInputFormatter.allow(
                       RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'\-]"),
                     ),
@@ -125,6 +158,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
+
                 // Apellido
                 TextFormField(
                   controller: _apellidoCtrl,
@@ -139,6 +173,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
+
                 // Teléfono
                 TextFormField(
                   controller: _telCtrl,
@@ -152,6 +187,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
+
                 // Email
                 TextFormField(
                   controller: _emailCtrl,
@@ -160,13 +196,12 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                   textInputAction: TextInputAction.next,
                   validator: _validEmail,
                   inputFormatters: [
-                    FilteringTextInputFormatter.deny(
-                      RegExp(r"\s"),
-                    ), // sin espacios
+                    FilteringTextInputFormatter.deny(RegExp(r"\s")),
                     LengthLimitingTextInputFormatter(60),
                   ],
                 ),
                 const SizedBox(height: 12),
+
                 // Dirección
                 TextFormField(
                   controller: _dirCtrl,
@@ -175,7 +210,8 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                   validator: (v) => _req(v, 'la dirección'),
                 ),
                 const SizedBox(height: 12),
-                // Fecha de nacimiento
+
+                // Fecha nacimiento
                 Row(
                   children: [
                     Expanded(
@@ -195,8 +231,10 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 20),
-                // boton grande guardar 
+
+                // Botón guardar
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
