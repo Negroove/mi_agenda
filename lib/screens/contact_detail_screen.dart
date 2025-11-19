@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mi_agenda/screens/widgets/contact_form_screen.dart';
 import 'package:provider/provider.dart';
 import '../models/contact.dart';
 import '../providers/contacts_provider.dart';
-import 'contact_form_screen.dart';
+import '../screens/login_screen.dart';
 
 class ContactDetailScreen extends StatelessWidget {
   final String contactId;

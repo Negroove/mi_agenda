@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mi_agenda/models/contact.dart';
+import 'package:mi_agenda/providers/contacts_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import '../models/contact.dart';
-import '../providers/contacts_provider.dart';
+
 
 class ContactFormScreen extends StatefulWidget {
   final Contact? edit; // 👈 NUEVO — Si viene un contacto, es edición

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/contacts_provider.dart';
 import '../providers/auth_provider.dart';
-import 'contact_form_screen.dart';
+import '../screens/widgets/contact_form_screen.dart';
 import 'contact_detail_screen.dart';
 
 class ContactsScreen extends StatefulWidget {
